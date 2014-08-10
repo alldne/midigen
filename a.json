@@ -1,11 +1,26 @@
 {
   "tracks":[
     {
-      "instrument": "rhythm",
+      "style": "random-arpeggio",
+      "bars": [
+        {
+          "rhythm": "oooo----",
+          "chord": "Am",
+        },
+        { "chord": "F" },
+        { "chord": "G" }
+        { "chord": "Am" }
+        { "chord": "Am" }
+        { "chord": "F" },
+        { "chord": "G" }
+        { "chord": "Am" }
+      ]
+    },
+    {
       "type": "rhythm",
       "bars": [
         {
-          "rhythm": "o-oo xoo- ooxo o-oo",
+          "rhythm": "o-ooxo o-ooxo o-oo",
           "repeat": 8
         }
       ]

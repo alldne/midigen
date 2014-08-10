@@ -33,7 +33,7 @@ def make_midi(midi_file, track):
     offset = 0
     for bar in track['bars']:
         bar_length = bar.get('length', 4)
-        notes = parse_rhythm(bar['rhythm'], bar_length, track['type'])
+        notes = parse_rhythm(bar, track['type'])
 
         repeat = bar.get('repeat', 1)
         for i in range(repeat):
@@ -41,7 +41,10 @@ def make_midi(midi_file, track):
                 midi_file.addNote(track_id, channel, note['pitch'], offset + note['time'], note['duration'], volume)
             offset += bar_length
 
-def parse_rhythm(rhythm_string, bar_length, track_type):
+def parse_rhythm(bar, track_type):
+    bar_length = bar.get('length', 4)
+    rhythm_string = bar['rhythm']
+
     tokens = tokenize(rhythm_string.replace(' ', ''))
 
     current_offset = 0
@@ -60,6 +63,8 @@ def parse_rhythm(rhythm_string, bar_length, track_type):
             if token is 'o':
                 if track_type == 'rhythm':
                     note = 'C1'
+                elif track_type == 'random-arpeggio':
+                    note = get_random_note(bar)
                 else:
                     note = 'C3'
                 current_note = {'pitch': symbol_to_value(note), 'time': current_offset}
@@ -72,6 +77,15 @@ def parse_rhythm(rhythm_string, bar_length, track_type):
         result += [current_note]
 
     return result
+
+def get_random_note(bar):
+    base_offset, notes = parse_chord_symbol(bar['chord'])
+# get one of the notes randomly
+# return base_offset + randomly choiced note(offset)
+
+def parse_chord_symbol(symbol):
+    pass
+# parse and return (bass_offset, array of note offset)
 
 def symbol_to_value(symbol):
     C0 = 24
