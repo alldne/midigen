@@ -1,0 +1,14 @@
+{
+  "tracks":[
+    {
+      "instrument": "rhythm",
+      "type": "rhythm",
+      "bars": [
+        {
+          "rhythm": "o-oo xoo- ooxo o-oo",
+          "repeat": 8
+        }
+      ]
+    }
+  ]
+}

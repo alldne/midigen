@@ -1,0 +1,28 @@
+{
+  "tracks":[
+    {
+      "instrument": "chiptune",
+      "style": "arpeggio",
+      "bars": [
+        {
+          "rhythm": "xxox oxxx oxxo xxox",
+          "chord": "Cm7",
+          "length": 1
+        },
+        {
+          "chord": "Fm7"
+        }
+      ]
+    },
+    {
+      "instrument": "rhythm",
+      "style": "rhythm",
+      "bars": [
+        {
+          "rhythm": "o-oo xoo- ooxo o-oo",
+          "repeat": 8
+        }
+      ]
+    }
+  ]
+}
