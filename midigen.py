@@ -1,6 +1,8 @@
 #! /usr/bin/python
 
+import math
 from midiutil.MidiFile import MIDIFile
+import random
 import re
 import simplejson as json
 import sys
@@ -59,7 +61,9 @@ def process_bars(context, bars):
 
 def process_bar(context, bar):
     bar_length = bar.get('length', 4)
-    notes = parse_rhythm(bar['rhythm'], bar_length, context['track']['type'])
+    rhythm = parse_rhythm(bar['rhythm'], bar_length, context['track']['type'])
+    notes = make_notes(context['track'], bar, rhythm)
+
     midi_file = context['midi_file']
     track_id = context['track_id']
     channel = context['channel']
@@ -70,6 +74,23 @@ def process_bar(context, bar):
         for note in notes:
             midi_file.addNote(track_id, channel, note['pitch'], context['offset'] + note['time'], note['duration'], volume)
         context['offset'] += bar_length
+
+def make_notes(track, bar, rhythm):
+    print 'track type:', track['type']
+    base_octave = track.get('base_octave', 2)
+    if track['type'] == 'rhythm':
+        for note in rhythm:
+            note['pitch'] = 'C1'
+    elif track['type'] == 'random-arpeggio':
+        print 'chord symbol: ', bar['chord']
+        chord_tones = get_chord_tones(bar['chord'])
+        print 'chord_tones:', chord_tones
+        length = len(chord_tones)
+        for note in rhythm:
+            note['pitch'] = chord_tones[int(math.floor(length * random.random()))] + str(base_octave)
+            print 'generate..', note
+    return rhythm
+
 
 def parse_rhythm(rhythm_string, bar_length, track_type):
     tokens = tokenize(rhythm_string)
@@ -88,13 +109,14 @@ def parse_rhythm(rhythm_string, bar_length, track_type):
                 result += [current_note]
                 current_note = None
             if token is 'o':
-                if track_type == 'rhythm':
-                    note = 'C1'
-                elif track_type == 'random-arpeggio':
-                    note = get_random_note(bar)
-                else:
-                    note = 'C3'
-                current_note = {'pitch': symbol_to_value(note), 'time': current_offset}
+#                if track_type == 'rhythm':
+#                    note = 'C1'
+#                elif track_type == 'random-arpeggio':
+#                    note = get_random_note(bar)
+#                else:
+#                    note = 'C3'
+#                current_note = {'pitch': symbol_to_value(note), 'time': current_offset}
+                current_note = {'time': current_offset}
         current_offset += interval
 
     if current_note:
@@ -110,9 +132,79 @@ def get_random_note(bar):
 # get one of the notes randomly
 # return base_offset + randomly choiced note(offset)
 
-def parse_chord_symbol(symbol):
-    pass
-# parse and return (bass_offset, array of note offset)
+def parse_chord_symbol(chord_symbol):
+    m = re.match('^(?P<root>[A-G](b|#)?)(?P<symbol>(7|maj7|m7|m)?)(?P<tension>((b|#)?(5|9|11|13))?)', chord_symbol)
+    return m.group('root'), m.group('symbol'), m.group('tension')
+
+def get_chord_tones(chord_symbol):
+    root, symbol, tension = parse_chord_symbol(chord_symbol)
+
+    result = [root]
+
+    symbol = symbol or ''
+    symbol_without_7 = symbol.replace('7', '')
+    if symbol_without_7 == 'maj' or symbol_without_7 == '':
+        result += [get_note_with_interval(root, '3')]
+    elif symbol_without_7 == 'm':
+        result += [get_note_with_interval(root, 'b3')]
+
+    if tension == 'b5':
+        result += [get_note_with_interval(root, 'b5')]
+    else:
+        result += [get_note_with_interval(root, '5')]
+
+    if symbol.find('7') >= 0:
+        if symbol_without_7 == 'maj':
+            result += [get_note_with_interval(root, '7')]
+        elif symbol_without_7 == 'm' or symbol_without_7 == '':
+            result += [get_note_with_interval(root, 'b7')]
+
+    if tension:
+        result += [get_note_with_interval(root, tension)]
+
+    return result
+
+def get_note_with_interval(note, interval):
+    value = symbol_to_value(note + '0')
+    interval_map = {
+            '1': 0,
+            '2': 2,
+            '3': 4,
+            '4': 5,
+            '5': 7,
+            '6': 9,
+            '0': 11, #7th
+            }
+
+    temp_signature = interval.count('#')
+    interval = interval.replace('#', '')
+    temp_signature -= interval.count('b')
+    interval = interval.replace('b', '')
+
+    interval = str(int(interval)%7)
+
+    value_to_add = interval_map[interval] + temp_signature
+    return re.sub('\d+', '', value_to_symbol(value + value_to_add))
+
+def value_to_symbol(value):
+    mapper = {
+            0: 'C',
+            2: 'D',
+            4: 'E',
+            5: 'F',
+            7: 'G',
+            9: 'A',
+            11: 'B'
+            }
+    offset = int(value)%12
+    if offset in mapper:
+        note = mapper[offset]
+    else:
+        note = mapper[offset+1] + 'b'
+
+    base = str(int(value)/12 - 2)
+    return note + base
+
 
 def symbol_to_value(symbol):
     C0 = 24

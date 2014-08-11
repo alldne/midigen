@@ -1,19 +1,20 @@
 {
   "tracks":[
     {
-      "style": "random-arpeggio",
+      "type": "random-arpeggio",
+      "base_octave": 2,
       "bars": {
         "sequence": [
           {
             "rhythm": "oooo----",
-            "chord": "Am",
+            "chord": "Am"
           },
           { "chord": "F" },
-          { "chord": "G" }
-          { "chord": "Am" }
-          { "chord": "Am" }
+          { "chord": "G" },
+          { "chord": "Am" },
+          { "chord": "Am" },
           { "chord": "F" },
-          { "chord": "G" }
+          { "chord": "G" },
           { "chord": "Am" }
         ]
       }
