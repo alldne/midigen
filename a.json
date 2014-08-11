@@ -2,28 +2,32 @@
   "tracks":[
     {
       "style": "random-arpeggio",
-      "bars": [
-        {
-          "rhythm": "oooo----",
-          "chord": "Am",
-        },
-        { "chord": "F" },
-        { "chord": "G" }
-        { "chord": "Am" }
-        { "chord": "Am" }
-        { "chord": "F" },
-        { "chord": "G" }
-        { "chord": "Am" }
-      ]
+      "bars": {
+        "sequence": [
+          {
+            "rhythm": "oooo----",
+            "chord": "Am",
+          },
+          { "chord": "F" },
+          { "chord": "G" }
+          { "chord": "Am" }
+          { "chord": "Am" }
+          { "chord": "F" },
+          { "chord": "G" }
+          { "chord": "Am" }
+        ]
+      }
     },
     {
       "type": "rhythm",
-      "bars": [
-        {
-          "rhythm": "o-ooxo o-ooxo o-oo",
-          "repeat": 8
-        }
-      ]
+      "bars": {
+        "sequence": [
+          {
+            "rhythm": "o-oo xoo- ooxo o-oo",
+            "repeat": 8
+          }
+        ]
+      }
     }
   ]
 }

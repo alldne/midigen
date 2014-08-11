@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from midiutil.MidiFile import MIDIFile
+import re
 import simplejson as json
 import sys
 
@@ -31,21 +32,47 @@ def make_midi(midi_file, track):
     channel = 0
     volume = 100
     offset = 0
-    for bar in track['bars']:
-        bar_length = bar.get('length', 4)
-        notes = parse_rhythm(bar, track['type'])
 
-        repeat = bar.get('repeat', 1)
-        for i in range(repeat):
-            for note in notes:
-                midi_file.addNote(track_id, channel, note['pitch'], offset + note['time'], note['duration'], volume)
-            offset += bar_length
+    context = {
+        'channel': 0,
+        'volume': 100,
+        'offset': 0,
+        'midi_file': midi_file,
+        'track': track,
+        'track_id': track_id
+    }
 
-def parse_rhythm(bar, track_type):
+    process_bars(context, track['bars'])
+
+def is_bar(bar_or_bars):
+    return not bar_or_bars.has_key('sequence')
+
+def process_bars(context, bars):
+    repeat = bars.get('repeat', 1)
+    for i in range(repeat):
+        print bars
+        for bar_or_bars in bars['sequence']:
+            if is_bar(bar_or_bars):
+                process_bar(context, bar_or_bars)
+            else:
+                process_bars(context, bar_or_bars)
+
+def process_bar(context, bar):
     bar_length = bar.get('length', 4)
-    rhythm_string = bar['rhythm']
+    notes = parse_rhythm(bar['rhythm'], bar_length, context['track']['type'])
+    midi_file = context['midi_file']
+    track_id = context['track_id']
+    channel = context['channel']
+    volume = context['volume']
 
-    tokens = tokenize(rhythm_string.replace(' ', ''))
+    repeat = bar.get('repeat', 1)
+    for i in range(repeat):
+        for note in notes:
+            midi_file.addNote(track_id, channel, note['pitch'], context['offset'] + note['time'], note['duration'], volume)
+        context['offset'] += bar_length
+
+def parse_rhythm(rhythm_string, bar_length, track_type):
+    tokens = tokenize(rhythm_string)
 
     current_offset = 0
     interval = float(bar_length)/len(tokens)
@@ -108,10 +135,8 @@ def symbol_to_value(symbol):
     return result + temp_signature
 
 def tokenize(string):
-    result = []
-    for c in string:
-        result += [c]
-    return result
+    string = string.replace(' ', '')
+    return re.findall('o|x|-|1?[0-9]', string)
 
 if __name__ == "__main__":
     main()
