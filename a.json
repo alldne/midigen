@@ -40,6 +40,7 @@
     },
     {
       "bars": {
+        "base_octave": 1,
         "sequence": [
           {
             "style": {"path": "style/disco.json", "name": "bass"},

@@ -1,8 +1,13 @@
 {
   "bass": {
     "type": "custom",
-    "base_octave": 2,
+    "base_octave": 1,
     "rhythm": "18181818"
+  },
+  "kim-daeri": {
+    "type": "custom",
+    "base_octave": 1,
+    "rhythm": "1--- 8x8x 1--- 8x8x 1--- 8x8x 1---8x8x"
   },
   "rhythm": {
     "type": "rhythm",
