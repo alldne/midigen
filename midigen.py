@@ -46,6 +46,7 @@ def make_midi(midi_file, track):
         'track_id': track_id
     }
 
+    track['bars']['parent'] = track
     process_bars(context, track['bars'])
 
 def is_bar(bar_or_bars):
@@ -65,10 +66,21 @@ def process_bars(context, bars):
             else:
                 process_bars(context, bar_or_bars)
 
+# FIXME: when bars is parent, it may not find its child but search directly its parent.
+
 def process_bar(context, bar):
+    raw_rhythm = get_property(bar, 'rhythm')
+    style = get_property(bar, 'style')
+    if style:
+        with open(style['path'], 'r') as f:
+            read_data = f.read()
+        style_element = json.loads(read_data)
+        style_element[style['name']]['parent'] = bar['parent']
+        bar['parent'] = style_element[style['name']]
+
     bar_length = get_property(bar, 'length')
     raw_rhythm = get_property(bar, 'rhythm')
-    rhythm = parse_rhythm(raw_rhythm, bar_length, context['track']['type'])
+    rhythm = parse_rhythm(raw_rhythm, bar_length, context['track'].get('type', ''))
     notes = make_notes(context['track'], bar, rhythm)
 
     midi_file = context['midi_file']
@@ -102,13 +114,13 @@ def get_property(element, property):
             return bar_default_value[property]
 
 def make_notes(track, bar, rhythm):
-    print 'track type:', track['type']
+    track_type = get_property(bar, 'type')
     base_octave = get_property(track, 'base_octave')
-    if track['type'] == 'rhythm':
+    if track_type == 'rhythm':
         for note in rhythm:
             note['note'] = 'C1'
             note['pitch'] = symbol_to_value(note['note'])
-    elif track['type'] == 'random-arpeggio':
+    elif track_type == 'random-arpeggio':
         print 'chord symbol: ', bar['chord']
         chord_tones = get_chord_tones(bar['chord'])
         print 'chord_tones:', chord_tones
@@ -117,11 +129,18 @@ def make_notes(track, bar, rhythm):
             note['note'] = chord_tones[int(math.floor(length * random.random()))] + str(base_octave)
             note['pitch'] = symbol_to_value(note['note'])
             print 'generate..', note
-    elif track['type'] == 'ascending-arpeggio':
+    elif track_type == 'ascending-arpeggio':
         chord_tones = get_chord_tones(bar['chord'])
         length = len(chord_tones)
         for note in rhythm:
             note['note'] = chord_tones[rhythm.index(note)%length] + str(base_octave)
+            note['pitch'] = symbol_to_value(note['note'])
+    elif track_type == 'custom':
+        chord = get_property(bar, 'chord')
+        root, _, _ = parse_chord_symbol(chord)
+        for note in rhythm:
+            offset = int(note['interval_hint'])/7
+            note['note'] = get_note_with_interval(root, note['interval_hint']) + str(base_octave+offset)
             note['pitch'] = symbol_to_value(note['note'])
     return rhythm
 
@@ -134,22 +153,18 @@ def parse_rhythm(rhythm_string, bar_length, track_type):
     current_note = None
     result = []
     for token in tokens:
-        if token in ('o', 'x'):
+        is_numeric = len(re.findall('[1-9]', token)) != 0
+        if token in ('o', 'x') or is_numeric:
             if current_note:
                 current_note['duration'] = current_offset - current_note['time']
                 if track_type == 'rhythm':
                     current_note['duration'] /= float(2)
                 result += [current_note]
                 current_note = None
-            if token is 'o':
-#                if track_type == 'rhythm':
-#                    note = 'C1'
-#                elif track_type == 'random-arpeggio':
-#                    note = get_random_note(bar)
-#                else:
-#                    note = 'C3'
-#                current_note = {'pitch': symbol_to_value(note), 'time': current_offset}
+            if token is 'o' or is_numeric:
                 current_note = {'time': current_offset}
+                if is_numeric:
+                    current_note['interval_hint'] = token
         current_offset += interval
 
     if current_note:
@@ -261,7 +276,7 @@ def symbol_to_value(symbol):
 
 def tokenize(string):
     string = string.replace(' ', '')
-    return re.findall('o|x|-|1?[0-9]', string)
+    return re.findall('o|x|-|[1-9]', string)
 
 if __name__ == "__main__":
     main()

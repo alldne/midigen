@@ -39,6 +39,23 @@
       }
     },
     {
+      "bars": {
+        "sequence": [
+          {
+            "style": {"path": "style/disco.json", "name": "bass"},
+            "chord": "Am"
+          },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" },
+          { "chord": "Am" },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" }
+        ]
+      }
+    },
+    {
       "type": "rhythm",
       "bars": {
         "sequence": [
