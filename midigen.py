@@ -20,6 +20,8 @@ def main():
     for track in song_descriptor['tracks']:
         make_midi(midi_file, track)
 
+    print 'make_midi is done'
+
     with open("test.mid", 'wb') as outf:
         midi_file.writeFile(outf)
 
@@ -50,18 +52,23 @@ def is_bar(bar_or_bars):
     return not bar_or_bars.has_key('sequence')
 
 def process_bars(context, bars):
-    repeat = bars.get('repeat', 1)
+    repeat = get_property(bars, 'repeat')
     for i in range(repeat):
         print bars
-        for bar_or_bars in bars['sequence']:
+        for bar_or_bars, previous in zip(bars['sequence'], [None]+bars['sequence']):
+            if previous:
+                bar_or_bars['parent'] = previous
+            else:
+                bar_or_bars['parent'] = bars
             if is_bar(bar_or_bars):
                 process_bar(context, bar_or_bars)
             else:
                 process_bars(context, bar_or_bars)
 
 def process_bar(context, bar):
-    bar_length = bar.get('length', 4)
-    rhythm = parse_rhythm(bar['rhythm'], bar_length, context['track']['type'])
+    bar_length = get_property(bar, 'length')
+    raw_rhythm = get_property(bar, 'rhythm')
+    rhythm = parse_rhythm(raw_rhythm, bar_length, context['track']['type'])
     notes = make_notes(context['track'], bar, rhythm)
 
     midi_file = context['midi_file']
@@ -69,28 +76,54 @@ def process_bar(context, bar):
     channel = context['channel']
     volume = context['volume']
 
-    repeat = bar.get('repeat', 1)
+    repeat = get_property(bar, 'repeat')
     for i in range(repeat):
         for note in notes:
+            print 'repeat',i,'(', notes.index(note),'/', len(notes),')', note
             midi_file.addNote(track_id, channel, note['pitch'], context['offset'] + note['time'], note['duration'], volume)
         context['offset'] += bar_length
 
+bar_default_value = {
+  'length': 4,
+  'repeat': 1,
+  'base_octave': 2
+}
+
+def get_property(element, property):
+    if property in element:
+        return element[property]
+    else:
+        current = element
+        while 'parent' in current:
+            if property in current['parent']:
+                return current['parent'][property]
+            current = current['parent']
+        if property in bar_default_value:
+            return bar_default_value[property]
+
 def make_notes(track, bar, rhythm):
     print 'track type:', track['type']
-    base_octave = track.get('base_octave', 2)
+    base_octave = get_property(track, 'base_octave')
     if track['type'] == 'rhythm':
         for note in rhythm:
-            note['pitch'] = 'C1'
+            note['note'] = 'C1'
+            note['pitch'] = symbol_to_value(note['note'])
     elif track['type'] == 'random-arpeggio':
         print 'chord symbol: ', bar['chord']
         chord_tones = get_chord_tones(bar['chord'])
         print 'chord_tones:', chord_tones
         length = len(chord_tones)
         for note in rhythm:
-            note['pitch'] = chord_tones[int(math.floor(length * random.random()))] + str(base_octave)
+            note['note'] = chord_tones[int(math.floor(length * random.random()))] + str(base_octave)
+            note['pitch'] = symbol_to_value(note['note'])
             print 'generate..', note
+    elif track['type'] == 'ascending-arpeggio':
+        chord_tones = get_chord_tones(bar['chord'])
+        length = len(chord_tones)
+        for note in rhythm:
+            note['note'] = chord_tones[rhythm.index(note)%length] + str(base_octave)
+            note['pitch'] = symbol_to_value(note['note'])
     return rhythm
-
 
 def parse_rhythm(rhythm_string, bar_length, track_type):
     tokens = tokenize(rhythm_string)

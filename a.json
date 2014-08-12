@@ -1,6 +1,25 @@
 {
   "tracks":[
     {
+      "type": "ascending-arpeggio",
+      "base_octave": 2,
+      "bars": {
+        "sequence": [
+          {
+            "rhythm": "oooo----",
+            "chord": "Am"
+          },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" },
+          { "chord": "Am" },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" }
+        ]
+      }
+    },
+    {
       "type": "random-arpeggio",
       "base_octave": 2,
       "bars": {
