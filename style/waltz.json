@@ -1,0 +1,15 @@
+{
+  "bass": {
+    "type": "custom",
+    "base_octave": 1,
+    "rhythm": "1-8x8x1-8x8x"
+  },
+  "rhythm": {
+    "type": "rhythm",
+    "rhythm": "xooxoo"
+  },
+  "arpeggio": {
+    "type": "ascending-arpeggio",
+    "rhythm": "xoooxx"
+  }
+}

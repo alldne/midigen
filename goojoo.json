@@ -1,0 +1,64 @@
+{
+  "tracks":[
+    {
+      "name": "bass",
+      "style": {"path": "style/disco.json", "name": "kim-daeri"},
+      "bars": {
+        "base_octave": 1,
+        "sequence": [
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "C", "length": 1 },
+          { "chord": "G" },
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "G7", "length": 4 },
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "C", "length": 1 },
+          { "chord": "G" },
+          { "chord": "C", "length": 2 }
+        ]
+      }
+    },
+    {
+      "name": "left-hand",
+      "style": { "path": "style/basic.json", "name": "beyer-left-hand"},
+      "bars": {
+        "sequence": [
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "C", "length": 1 },
+          { "chord": "G" },
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "C", "length": 4 },
+          { "chord": "G7", "length": 4 },
+          { "chord": "C", "length": 2 },
+          { "chord": "F" },
+          { "chord": "C", "length": 1 },
+          { "chord": "G" },
+          { "chord": "C", "length": 2 }
+        ]
+      }
+    },
+    {
+      "name": "beat",
+      "style": {"path": "style/disco.json", "name": "rhythm"},
+      "bars": {
+        "sequence": [
+          { "repeat": 10 }
+        ]
+      }
+    }
+  ]
+}

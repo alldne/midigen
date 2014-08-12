@@ -1,0 +1,41 @@
+{
+  "tracks":[
+    {
+      "name": "bass",
+      "style": {"path": "style/disco.json", "name": "kim-daeri"},
+      "bars": {
+        "base_octave": 1,
+        "repeat": 2,
+        "sequence": [
+          { "chord": "Am" },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" }
+        ]
+      }
+    },
+    {
+      "name": "arpeggio",
+      "type": "ascending-arpeggio",
+      "bars": {
+        "repeat": 2,
+        "rhythm": "oooo ---x",
+        "sequence": [
+          { "chord": "Am" },
+          { "chord": "F" },
+          { "chord": "G" },
+          { "chord": "Am" }
+        ]
+      }
+    },
+    {
+      "name": "beat",
+      "style": {"path": "style/disco.json", "name": "rhythm"},
+      "bars": {
+        "sequence": [
+          { "repeat": 8 }
+        ]
+      }
+    }
+  ]
+}
