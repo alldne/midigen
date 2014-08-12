@@ -1,0 +1,11 @@
+{
+  "bass": {
+    "type": "custom",
+    "base_octave": 2,
+    "rhythm": "18181818"
+  },
+  "rhythm": {
+    "type": "rhythm",
+    "rhythm": "o-oo xoo- ooxo o-oo"
+  }
+}
